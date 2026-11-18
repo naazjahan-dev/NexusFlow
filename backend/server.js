@@ -1,6 +1,7 @@
 
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 require("dotenv").config();
 
 const app = express();
@@ -11,12 +12,22 @@ app.use(express.json());
 
 // Test route
 app.get("/", (req, res) => {
-    res.send("NexusFlow Backend is Running!");
+  res.send("NexusFlow Backend is Running!");
 });
 
-// Server
-const PORT = process.env.PORT || 5000;
+// MongoDB connection
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("MongoDB Connected Successfully!");
 
-app.listen(PORT, () => {
-    console.log(`NexusFlow server running on port ${PORT}`);
-});
+    const PORT = process.env.PORT || 5000;
+
+    app.listen(PORT, () => {
+      console.log(`NexusFlow server running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("MongoDB Connection Failed:", error.message);
+    process.exit(1);
+  });
