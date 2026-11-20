@@ -1,3 +1,6 @@
+const dns = require("dns");
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 const express = require("express");
 const cors = require("cors");
@@ -15,9 +18,13 @@ app.get("/", (req, res) => {
   res.send("NexusFlow Backend is Running!");
 });
 
+
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, {
+    family: 4,
+    serverSelectionTimeoutMS: 10000,
+  })
   .then(() => {
     console.log("MongoDB Connected Successfully!");
 
@@ -29,5 +36,5 @@ mongoose
   })
   .catch((error) => {
     console.error("MongoDB Connection Failed:", error.message);
-    process.exit(1);
   });
+
