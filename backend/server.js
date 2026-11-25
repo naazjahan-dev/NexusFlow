@@ -1,22 +1,44 @@
+
+// Load backend/.env regardless of the directory the server is started from
+require("dotenv").config({ path: require("path").join(__dirname, ".env") });
+
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
-
 const connectDB = require("./config/db");
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
+// Health check
 app.get("/", (req, res) => {
-  res.send("NexusFlow Backend is Running!");
+  res.json({ message: "NexusFlow Backend is running!" });
 });
 
-const PORT = process.env.PORT || 5000;
-
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`NexusFlow server running on port ${PORT}`);
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "OK",
+    message: "NexusFlow API is working",
   });
 });
+
+// Start server after database connection
+const PORT = process.env.PORT || 5000;
+
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    app.listen(PORT, () => {
+      console.log(`NexusFlow server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Server startup failed:", error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
+
