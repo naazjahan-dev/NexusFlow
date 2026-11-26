@@ -1,4 +1,4 @@
-
+const authRoutes = require("./routes/authRoutes");
 // Load backend/.env regardless of the directory the server is started from
 require("dotenv").config({ path: require("path").join(__dirname, ".env") });
 
@@ -11,6 +11,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use("/api/auth", authRoutes); 
 
 // Health check
 app.get("/", (req, res) => {
