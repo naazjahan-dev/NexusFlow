@@ -1,0 +1,9 @@
+import React, { useMemo, useState } from "react";
+import WorkspaceLayout from "../components/WorkspaceLayout";
+import { useData } from "../context/DataContext";
+export default function ActivityLogsPage(){
+ const {activities,log}=useData();const [query,setQuery]=useState("");
+ const shown=useMemo(()=>activities.filter(a=>`${a.title} ${a.detail}`.toLowerCase().includes(query.toLowerCase())),[activities,query]);
+ const exportCsv=()=>{const esc=v=>`"${String(v??"").replaceAll('"','""')}"`;const csv=[["Time","Action","Details"],...shown.map(a=>[new Date(a.createdAt).toISOString(),a.title,a.detail])].map(r=>r.map(esc).join(",")).join("\n");const url=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));const a=document.createElement("a");a.href=url;a.download="nexusflow-activity-logs.csv";a.click();URL.revokeObjectURL(url);};
+ return <WorkspaceLayout title="Activity Logs" eyebrow="AUDIT"><div className="nf-page-intro"><div><h1>Workspace Activity</h1><p>A chronological record of actions performed in this browser workspace.</p></div><button className="nf-primary-button" onClick={exportCsv}>↓ Export CSV</button></div><div className="nf-toolbar"><input className="nf-control search-control" placeholder="Search activity..." value={query} onChange={e=>setQuery(e.target.value)}/><button className="nf-secondary-button" onClick={()=>log("Activity log checked","Manual refresh")}>↻ Refresh</button></div><section className="nf-panel"><div className="activity-list full-activity">{shown.map(a=><div className="activity-item" key={a.id}><div className="activity-icon">✓</div><div className="activity-details"><strong>{a.title}</strong><p>{a.detail}</p><small>{new Date(a.createdAt).toLocaleString()}</small></div></div>)}{shown.length===0&&<div className="nf-empty-state">No matching activity found.</div>}</div><div className="nf-list-footer">{shown.length} activity records · Stored locally in this browser.</div></section></WorkspaceLayout>;
+}
