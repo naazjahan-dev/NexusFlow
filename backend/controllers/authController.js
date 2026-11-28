@@ -55,10 +55,12 @@ const newUser = await User.create({
     });
 
   } catch (error) {
-    res.status(500).json({
-      message: "Registration failed",
-      error: error.message
-    });
+  console.error("Registration error:", error.message);
+
+  res.status(500).json({
+    message: "Registration failed. Please try again later."
+  });
+}
   }
 };
 
